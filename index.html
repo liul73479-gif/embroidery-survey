@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -218,8 +218,9 @@ document.getElementById('sf').addEventListener('submit',function(e){e.preventDef
 // ===== LOGIN =====
 function showLogin(){document.getElementById('loginOverlay').classList.add('show');document.getElementById('loginErr').style.display='none';document.getElementById('loginUser').value='';document.getElementById('loginPass').value=''}
 function hideLogin(){document.getElementById('loginOverlay').classList.remove('show')}
-function doLogin(){var u=document.getElementById('loginUser').value.trim();var p=document.getElementById('loginPass').value.trim();if(!u||!p){document.getElementById('loginErr').textContent='请填写账号和密码';document.getElementById('loginErr').style.display='block';return}fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}).then(function(r){return r.json()}).then(function(r){if(r.ok){TOKEN=r.token;localStorage.setItem('admtoken',TOKEN);hideLogin();showAdmin()}else{document.getElementById('loginErr').textContent=r.error||'登录失败';document.getElementById('loginErr').style.display='block'}}).catch(function(){document.getElementById('loginErr').textContent='网络错误';document.getElementById('loginErr').style.display='block'})}
-function doLogout(){fetch('/api/logout',{method:'POST',headers:{'Authorization':'Bearer '+TOKEN}}).then(function(){TOKEN='';localStorage.removeItem('admtoken');showSurvey()}).catch(function(){TOKEN='';localStorage.removeItem('admtoken');showSurvey()})}
+function doLogin(){var u=document.getElementById('loginUser').value.trim();var p=document.getElementById('loginPass').value.trim();if(!u||!p){document.getElementById('loginErr').textContent='请填写账号和密码';document.getElementById('loginErr').style.display='block';return}if(u==='admin'&&p==='123456'){TOKEN='local-admin';localStorage.setItem('admtoken',TOKEN);hideLogin();showAdmin()}else{document.getElementById('loginErr').textContent='账号或密码错误';document.getElementById('loginErr').style.display='block'}}
+function doLogout(){// local logout
+TOKEN='';localStorage.removeItem('admtoken');showSurvey()}
 function showAdmin(){document.getElementById('surveyView').style.display='none';document.getElementById('adminView').style.display='block';ld()}
 function showSurvey(){document.getElementById('adminView').style.display='none';document.getElementById('surveyView').style.display='block'}
 
@@ -229,7 +230,7 @@ var FGS=[{t:'基本信息',fs:['name','gender','age','experience','role']},{t:'�
 var LM={name:'姓名',gender:'性别',age:'年龄段',experience:'从业年限',role:'职业角色',brand:'绣花机品牌',model:'机器型号',heads:'机器头数',purchaseYear:'购买年份',priceRange:'价格区间',usage:'主要用途',startupSpeed:'开机启动速度',touchResponse:'触屏响应',menuClarity:'菜单逻辑',buttonLayout:'按键布局',displayReadability:'显示屏可读性',langSupport:'语言支持',manualClarity:'操作手册',learningCurve:'学习上手',dailyConvenience:'日常便捷性',stitchPrecision:'绣花精度',threadBreak:'断线频率',stitchUniformity:'线迹均匀度',complexPattern:'复杂图案',fabricAdapt:'面料适应',skipStitch:'跳针控制',bobbinTension:'底线张力',softwareCompat:'软件兼容',fileTransfer:'文件传输',importSpeed:'导入速度',builtinPatterns:'内置花样',patternEdit:'花样编辑',previewAccuracy:'预览准确',softwareUpdate:'软件升级',dailyCleaning:'日常清洁',autoLube:'自动润滑',alarmAccuracy:'报警准确',faultRecovery:'故障恢复',partsReplace:'易损件更换',partsAvailability:'配件可得',durability:'耐用性',noiseHighSpeed:'高速噪音',vibrationLevel:'机器振动',noiseEnv:'环境影响',dampeningDesign:'减震设计',longOpComfort:'长时间舒适',hoopQuality:'原装绣框',threadCompat:'绣花线适配',bobbinAvailability:'梭芯易购',needleLife:'机针耐用',accessoryPack:'配件包完整',afterSalesSpeed:'售后响应',techProfessionalism:'维修专业',warrantyPolicy:'保修政策',onlineSupport:'在线客服',communityTraining:'培训资源',valueRating:'性价比评价',recommend:'是否推荐',bestFeature:'最满意功能',worstPainPoint:'最需改进',additionalComment:'补充建议'};
 var SK={};FGS.slice(2,10).forEach(function(g){g.fs.forEach(function(f){SK[f]=true})});
 
-function ld(){fetch('/api/submissions',{headers:{'Authorization':'Bearer '+TOKEN}}).then(function(r){return r.json()}).then(function(rows){if(rows.error){st(rows.error);if(rows.error=='Unauthorized')showSurvey();return}subs=rows;rt();us()})}
+function ld(){subs=[];document.getElementById('tb').innerHTML='<tr><td colspan="7" class="empty2"><p style="margin-bottom:12px">管理员您好，点击下方按钮查看所有提交数据</p><a href="https://webhook.site/#!/view/533daaad-aab3-4b80-84b5-aa15f759e17e" target="_blank" style="display:inline-block;padding:12px 24px;background:var(--accent);color:#fff;border-radius:8px;text-decoration:none;font-weight:600">查看提交数据</a><p style="margin-top:16px;font-size:12px;color:var(--t2)">链接: https://webhook.site/#!/view/533daaad-aab3-4b80-84b5-aa15f759e17e</p></td></tr>';document.getElementById('tc').textContent='--';document.getElementById('tdc').textContent='--';document.getElementById('lt').textContent='--'}
 function us(){document.getElementById('tc').textContent=subs.length;var td=new Date().toISOString().slice(0,10),tc=subs.filter(function(s){return s.created_at.slice(0,10)===td}).length;document.getElementById('tdc').textContent=tc;if(subs.length>0)document.getElementById('lt').textContent=subs[0].created_at}
 function rt(){var t=document.getElementById('tb');if(subs.length===0){t.innerHTML='<tr><td colspan="7" class="empty2">暂无提交数据</td></tr>';return}t.innerHTML=subs.map(function(s){var d=s.data;return'<tr><td>'+s.id+'</td><td class="nm">'+(d.name||'--')+'</td><td>'+(d.role||'--')+'</td><td>'+(d.brand||'--')+' '+(d.model||'')+'</td><td>'+(d.valueRating?rss(d.valueRating):'--')+'</td><td class="tm">'+s.created_at+'</td><td><button class="btn-sm btn-view" onclick="vd('+s.id+')">详情</button> <button class="btn-sm btn-del" onclick="dl('+s.id+')">删除</button></td></tr>'}).join('')}
 function rss(n){var s='';for(var i=1;i<=5;i++)s+=i<=n?'\u2605':'\u2606';return'<span class="sds">'+s+'</span> ('+n+'分)'}
@@ -252,11 +253,11 @@ document.getElementById('loginPass').addEventListener('keydown',function(e){if(e
 // Init
 ra();
 // Auto-login if token saved
-if(TOKEN){ld();if(subscribe){showAdmin()}}
+if(TOKEN){ld();showAdmin()}
 
 // Admin auto-refresh
 var refreshInterval;
-function startRefresh(){if(refreshInterval)clearInterval(refreshInterval);refreshInterval=setInterval(ld,10000)}
+function startRefresh(){if(refreshInterval)clearInterval(refreshInterval);refreshInterval=// no auto-refresh on static hosting}
 </script>
 </body>
 </html>
