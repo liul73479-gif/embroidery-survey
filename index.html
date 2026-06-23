@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -218,7 +218,8 @@ document.getElementById('sf').addEventListener('submit',function(e){e.preventDef
 // ===== LOGIN =====
 function showLogin(){document.getElementById('loginOverlay').classList.add('show');document.getElementById('loginErr').style.display='none';document.getElementById('loginUser').value='';document.getElementById('loginPass').value=''}
 function hideLogin(){document.getElementById('loginOverlay').classList.remove('show')}
-function doLogin(){var u=document.getElementById('loginUser').value.trim();var p=document.getElementById('loginPass').value.trim();if(!u||!p){document.getElementById('loginErr').textContent='请填写账号和密码';document.getElementById('loginErr').style.display='block';return}if(u==='admin'&&p==='123456'){TOKEN='local-admin';localStorage.setItem('admtoken',TOKEN);hideLogin();showAdmin()}else{document.getElementById('loginErr').textContent='账号或密码错误';document.getElementById('loginErr').style.display='block'}.catch(function(){TOKEN='';localStorage.removeItem('admtoken');showSurvey()})}
+function doLogin(){var u=document.getElementById('loginUser').value.trim();var p=document.getElementById('loginPass').value.trim();if(!u||!p){document.getElementById('loginErr').textContent='请填写账号和密码';document.getElementById('loginErr').style.display='block';return}if(u==='admin'&&p==='123456'){TOKEN='admin-token';localStorage.setItem('admtoken',TOKEN);hideLogin();showAdmin()}else{document.getElementById('loginErr').textContent='账号或密码错误';document.getElementById('loginErr').style.display='block'}}
+function doLogout(){TOKEN='';localStorage.removeItem('admtoken');showSurvey()}
 function showAdmin(){document.getElementById('surveyView').style.display='none';document.getElementById('adminView').style.display='block';ld()}
 function showSurvey(){document.getElementById('adminView').style.display='none';document.getElementById('surveyView').style.display='block'}
 
@@ -228,14 +229,14 @@ var FGS=[{t:'基本信息',fs:['name','gender','age','experience','role']},{t:'�
 var LM={name:'姓名',gender:'性别',age:'年龄段',experience:'从业年限',role:'职业角色',brand:'绣花机品牌',model:'机器型号',heads:'机器头数',purchaseYear:'购买年份',priceRange:'价格区间',usage:'主要用途',startupSpeed:'开机启动速度',touchResponse:'触屏响应',menuClarity:'菜单逻辑',buttonLayout:'按键布局',displayReadability:'显示屏可读性',langSupport:'语言支持',manualClarity:'操作手册',learningCurve:'学习上手',dailyConvenience:'日常便捷性',stitchPrecision:'绣花精度',threadBreak:'断线频率',stitchUniformity:'线迹均匀度',complexPattern:'复杂图案',fabricAdapt:'面料适应',skipStitch:'跳针控制',bobbinTension:'底线张力',softwareCompat:'软件兼容',fileTransfer:'文件传输',importSpeed:'导入速度',builtinPatterns:'内置花样',patternEdit:'花样编辑',previewAccuracy:'预览准确',softwareUpdate:'软件升级',dailyCleaning:'日常清洁',autoLube:'自动润滑',alarmAccuracy:'报警准确',faultRecovery:'故障恢复',partsReplace:'易损件更换',partsAvailability:'配件可得',durability:'耐用性',noiseHighSpeed:'高速噪音',vibrationLevel:'机器振动',noiseEnv:'环境影响',dampeningDesign:'减震设计',longOpComfort:'长时间舒适',hoopQuality:'原装绣框',threadCompat:'绣花线适配',bobbinAvailability:'梭芯易购',needleLife:'机针耐用',accessoryPack:'配件包完整',afterSalesSpeed:'售后响应',techProfessionalism:'维修专业',warrantyPolicy:'保修政策',onlineSupport:'在线客服',communityTraining:'培训资源',valueRating:'性价比评价',recommend:'是否推荐',bestFeature:'最满意功能',worstPainPoint:'最需改进',additionalComment:'补充建议'};
 var SK={};FGS.slice(2,10).forEach(function(g){g.fs.forEach(function(f){SK[f]=true})});
 
-function ld(){subs=[];document.getElementById('tb').innerHTML='<tr><td colspan="7" class="empty2"><p style="margin-bottom:12px">管理员您好，点击下方按钮查看所有提交数据：</p><a href="https://webhook.site/#!/view/533daaad-aab3-4b80-84b5-aa15f759e17e" target="_blank" style="display:inline-block;padding:12px 24px;background:var(--accent);color:#fff;border-radius:8px;text-decoration:none;font-weight:600">查看提交数据</a></td></tr>';document.getElementById('tc').textContent='--';document.getElementById('tdc').textContent='--';document.getElementById('lt').textContent='--'}
+function ld(){subs=[];document.getElementById('tb').innerHTML='<tr><td colspan="7" class="empty2"><p style="margin-bottom:12px">管理员您好，所有提交数据请通过下方链接查看：</p><a href="https://webhook.site/#!/view/533daaad-aab3-4b80-84b5-aa15f759e17e" target="_blank" style="display:inline-block;padding:12px 24px;background:var(--accent);color:#fff;border-radius:8px;text-decoration:none;font-weight:600">查看提交数据</a></td></tr>';document.getElementById('tc').textContent='--';document.getElementById('tdc').textContent='--';document.getElementById('lt').textContent='--'}
 function us(){document.getElementById('tc').textContent=subs.length;var td=new Date().toISOString().slice(0,10),tc=subs.filter(function(s){return s.created_at.slice(0,10)===td}).length;document.getElementById('tdc').textContent=tc;if(subs.length>0)document.getElementById('lt').textContent=subs[0].created_at}
 function rt(){var t=document.getElementById('tb');if(subs.length===0){t.innerHTML='<tr><td colspan="7" class="empty2">暂无提交数据</td></tr>';return}t.innerHTML=subs.map(function(s){var d=s.data;return'<tr><td>'+s.id+'</td><td class="nm">'+(d.name||'--')+'</td><td>'+(d.role||'--')+'</td><td>'+(d.brand||'--')+' '+(d.model||'')+'</td><td>'+(d.valueRating?rss(d.valueRating):'--')+'</td><td class="tm">'+s.created_at+'</td><td><button class="btn-sm btn-view" onclick="vd('+s.id+')">详情</button> <button class="btn-sm btn-del" onclick="dl('+s.id+')">删除</button></td></tr>'}).join('')}
 function rss(n){var s='';for(var i=1;i<=5;i++)s+=i<=n?'\u2605':'\u2606';return'<span class="sds">'+s+'</span> ('+n+'分)'}
 function fv(k,v){if(v===null||v===undefined||v==='')return'--';if(Array.isArray(v))return v.join('\u3001');if(SK[k]&&typeof v==='number')return rss(v);return String(v)}
 function vd(id){var s=subs.find(function(x){return x.id===id});if(!s)return;var d=s.data;document.getElementById('dmTitle').textContent='提交详情 #'+s.id;var h='<p style="font-size:12px;color:var(--t2);margin-bottom:16px">时间: '+s.created_at+' | IP: '+s.ip+'</p>';FGS.forEach(function(g){h+='<table style="margin-bottom:20px"><thead><tr><th colspan="2">'+g.t+'</th></tr></thead>';g.fs.forEach(function(k){h+='<tr class="dr"><td>'+(LM[k]||k)+'</td><td>'+fv(k,d[k])+'</td></tr>'});h+='</table>'});document.getElementById('dmBody').innerHTML=h;document.getElementById('dm').classList.add('show')}
 function closeDetail(){document.getElementById('dm').classList.remove('show')}
-function dl(id){if(!confirm('确定删除提交 #'+id+' 吗？不可撤销。'))return;fetch('/api/submission/'+id,{method:'DELETE',headers:{'Authorization':'Bearer '+TOKEN}}).then(function(r){return r.json()}).then(function(r){st(r.ok?'已删除':'删除失败');ld()})}
+function dl(id){if(!confirm('确定删除提交 #'+id+' 吗？不可撤销。'))return;st('请在webhook.site管理数据')}
 function ec(){if(subs.length===0){st('没有数据');return}var keys=[];FGS.forEach(function(g){keys=keys.concat(g.fs)});var h=keys.map(function(k){return LM[k]||k});var rows=subs.map(function(s){return keys.map(function(k){var v=s.data[k];if(v===null||v===undefined)return'';if(Array.isArray(v))return v.join('\u3001');return String(v)})});var csv='\uFEFF'+h.join(',')+'\n';rows.forEach(function(r){csv+=r.map(function(c){return'"'+c.replace(/"/g,'""')+'"'}).join(',')+'\n'});var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='survey_'+new Date().toISOString().slice(0,10)+'.csv';a.click();st('导出成功')}
 
 // Keyboard: Esc closes modals
@@ -255,7 +256,7 @@ if(TOKEN){ld();showAdmin()}
 
 // Admin auto-refresh
 var refreshInterval;
-function startRefresh(){if(refreshInterval)clearInterval(refreshInterval);refreshInterval=// static: no auto-refresh}
+function startRefresh(){if(refreshInterval)clearInterval(refreshInterval);refreshInterval=// no auto-refresh}
 </script>
 </body>
 </html>
